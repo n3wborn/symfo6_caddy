@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  web:
+    build: nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "444:443"
+    volumes:
+      - $PWD:/app
+      - $PWD/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    working_dir: /app
+    networks:
+      - caddy
+
+  php-fpm:
+    image: php:8-fpm
+    restart: unless-stopped
+    volumes:
+      - $PWD:/app
+    working_dir: /app
+    networks:
+      - caddy
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    volumes:
+      - symfo6_caddy_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    networks:
+      - caddy
+
+networks:
+  caddy:
+    external: true
+
+volumes:
+  symfo6_caddy_db:
+  caddy_data:
+  caddy_config:
